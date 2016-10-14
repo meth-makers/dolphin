@@ -33,10 +33,11 @@ function loadScript(name, tabId, cb) {
 const arrowURLs = ['^https://github\\.com'];
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  if (changeInfo.status !== 'loading' || !tab.url.match(arrowURLs.join('|'))) return;
-
+  console.log("first");
+  if (changeInfo.status !== 'loading') return;
+  console.log("secind");
   const result = await isInjected(tabId);
   if (chrome.runtime.lastError || result[0]) return;
-
+  console.log("third");
   loadScript('inject', tabId, () => console.log('load inject bundle success!'));
 });
