@@ -49,11 +49,26 @@ class DolphinComment extends Component {
       dolphin_message: '',
     };
     this.handleChange = this.handleChange.bind(this);
+    this.buttonOnClick = this.buttonOnClick.bind(this);
   }
 
-  buttonOnClick = () => {
-    this.setState({ isVisible: !this.state.isVisible });
-  };
+  buttonOnClick() {
+    let curr_data = {};
+    curr_data['dolphin_message'] = this.state.dolphin_message;
+    curr_data['selected_text'] = this.state.data.selected_text;
+
+    var retrievedObject = localStorage.getItem(this.state.data.current_url);
+    retrievedObject = JSON.parse(retrievedObject)
+    console.log(retrievedObject);
+
+    if(!retrievedObject) {
+      retrievedObject = [];
+    }
+    retrievedObject.push(curr_data);
+
+    localStorage.setItem(this.state.data.current_url, JSON.stringify(retrievedObject));
+    removeExistingDolphinPopup();
+  }
 
   handleChange(e) {
     this.setState({'dolphin_message': e.target.value});
@@ -86,17 +101,21 @@ class DolphinComment extends Component {
   }
 }
 
+let removeExistingDolphinPopup = () => {
+  // Remove the existing with dolphin-comment-parent class name before injecting another
+  let previousElement = document.getElementsByClassName('dolphin-comment-parent')[0];
+  if (typeof previousElement !== 'undefined') {
+    previousElement.remove();
+  }
+}
+
 let getSelectionText = (e) => {
 
   if($(e.target).parents('.dolphin-comment-parent').hasClass('dolphin-comment-parent') || $(e.target).hasClass('dolphin-comment-parent')) {
     return;
   }
 
-  // Remove the existing with dolphin-comment-parent class name before injecting another
-  let previousElement = document.getElementsByClassName('dolphin-comment-parent')[0];
-  if (typeof previousElement !== 'undefined') {
-    previousElement.remove();
-  }
+  removeExistingDolphinPopup();
 
   let text = "";
   if (typeof window.getSelection !== "undefined") {
