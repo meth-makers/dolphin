@@ -33,6 +33,14 @@ export default class MainSection extends Component {
     this.setState({ filter });
   };
 
+  getSelectionText = () => {
+    let text = "";
+    if(window.getSelection) {
+      text = window.getSelection().toString();
+    }
+    return text;
+  }
+
   renderToggleAll(completedCount) {
     const { todos, actions } = this.props;
     if (todos.length > 0) {

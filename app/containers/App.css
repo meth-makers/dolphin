@@ -1,6 +1,6 @@
 .normal {
   background: #fff;
-  margin: 200px 0 40px 0;
+  margin: 50px 0 40px 0;
   position: relative;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2),
               0 25px 50px 0 rgba(0, 0, 0, 0.1);
@@ -26,12 +26,12 @@
 
 .normal h1 {
   position: absolute;
-  top: -155px;
+  top: -56px;
   width: 100%;
-  font-size: 100px;
+  font-size: 30px;
   font-weight: 100;
   text-align: center;
-  color: rgba(175, 47, 47, 0.15);
+  color: #323754;
   -webkit-text-rendering: optimizeLegibility;
   -moz-text-rendering: optimizeLegibility;
   -ms-text-rendering: optimizeLegibility;
