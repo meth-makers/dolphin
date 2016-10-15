@@ -82,10 +82,24 @@ class DolphinComment extends Component {
       width: "100%",
       resize: "vertical",
     };
+    let triangleStyle = {
+      width: 0,
+      height: 0,
+      borderLeft: "10px solid transparent",
+      borderRight: "10px solid rgb(245, 245, 245)",
+      borderTop: "10px solid transparent",
+      borderBottom: "10px solid transparent",
+      position: 'absolute',
+      left: -20,
+      top: 20
+    };
+    let buttonContainerStyle = {
+      textAlign: 'right'
+    };
 
     return (
       <div ref="dolphin-popup" className="dolphin-comment-child">
-        <div> URL: {this.state.data.current_url} {this.state.data.selected_text} </div>
+        <div style={triangleStyle}></div>
         <textarea
           value={this.state.dolphin_message}
           type='text'
@@ -93,9 +107,11 @@ class DolphinComment extends Component {
           style={textareadStyle}
           onChange={this.handleChange}
         />
-        <button onClick={this.buttonOnClick}>
-          Save
-        </button>
+        <div style={buttonContainerStyle}>
+          <button onClick={this.buttonOnClick}>
+            Save
+          </button>
+        </div>
       </div>
     );
   }
@@ -142,9 +158,9 @@ let getSelectionText = (e) => {
   console.log(selected_text_offset);
   let _top = selected_text_offset.top;
 
-  injectCommentForm.style.cssText = 'width:400px; position:fixed; padding:10px; right:100px; \
-    background: #f5f5f5; border-radius:3px; box-sizing:border-box; box-shadow: 1px 1px 5px 1px rgba(159,167,194, 0.6);';
-  injectCommentForm.style.top = _top + 'px';
+  injectCommentForm.style.cssText = 'width:400px; position:absolute; padding:10px; right:100px; \
+    background: #f5f5f5; border-radius:3px; box-sizing:border-box; box-shadow: 1px 1px 5px 1px rgba(159,167,194, 0.6);z-index: 100;';
+  injectCommentForm.style.top = _top-30 + 'px';
 
   document.body.appendChild(injectCommentForm);
   render(<DolphinComment data={data} />, injectCommentForm);
