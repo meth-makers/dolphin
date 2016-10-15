@@ -3,12 +3,6 @@ import TodoItem from './TodoItem';
 import { SHOW_ALL, SHOW_COMPLETED, SHOW_ACTIVE } from '../constants/TodoFilters';
 import style from './MainSection.css';
 
-const TODO_FILTERS = {
-  [SHOW_ALL]: () => true,
-  [SHOW_ACTIVE]: todo => !todo.completed,
-  [SHOW_COMPLETED]: todo => todo.completed
-};
-
 export default class MainSection extends Component {
 
   static propTypes = {
@@ -18,21 +12,42 @@ export default class MainSection extends Component {
 
   constructor(props, context) {
     super(props, context);
-    this.state = { filter: SHOW_ALL };
+    this.state = {'current_url_data': ''};
+
+    this.loadDataFromLocalStorage = this.loadDataFromLocalStorage.bind(this);
   }
 
-  handleClearCompleted = () => {
-    const atLeastOneCompleted = this.props.todos.some(todo => todo.completed);
-    if (atLeastOneCompleted) {
-      this.props.actions.clearCompleted();
-    }
-  };
+  loadDataFromLocalStorage() {
+    let current_url = 'current_url';
 
-  handleShow = filter => {
-    this.setState({ filter });
-  };
+    chrome.storage.local.get(current_url, function (result) {
+      // Ye nahi mila to kuch gadbad hai, ise milna chahiye
+      let real_current_url = result.current_url;
+      console.log(result);
+      console.log(real_current_url);
+      chrome.storage.local.get(real_current_url, function (response) {
+        console.log(response);
+        console.log(response.real_current_url);
+      }.bind(this));
 
-  getSelectionText = () => {
+      // let retrievedObject = [];
+      // if(!result.current_url) {
+      //   retrievedObject = [];
+      // } else {
+      //   retrievedObject = result.current_url;
+      // }
+      // retrievedObject.push(curr_data);
+      // console.log(retrievedObject);
+      // chrome.storage.local.set({'current_url': JSON.stringify(retrievedObject)}, function(){});
+      // removeExistingDolphinPopup();
+    }.bind(this));
+  }
+
+  componentDidMount() {
+    this.loadDataFromLocalStorage();
+  }
+
+  getSelectionText() {
     let text = "";
     if(window.getSelection) {
       text = window.getSelection().toString();
@@ -40,36 +55,28 @@ export default class MainSection extends Component {
     return text;
   }
 
-  renderToggleAll(completedCount) {
-    const { todos, actions } = this.props;
-    if (todos.length > 0) {
-      return (
-        <input
-          className={style.toggleAll}
-          type="checkbox"
-          checked={completedCount === todos.length}
-          onChange={actions.completeAll}
-        />
-      );
-    }
-  }
-
   render() {
     const { todos, actions } = this.props;
     const { filter } = this.state;
+    console.log(this.state);
 
-    const filteredTodos = todos.filter(TODO_FILTERS[filter]);
-    const completedCount = todos.reduce(
-      (count, todo) => (todo.completed ? count + 1 : count),
-      0
-    );
+    if(!this.state.current_url_data) {
+      console.log("----");
+      return null;
+    }
 
     return (
       <section className={style.main}>
-        {this.renderToggleAll(completedCount)}
         <ul className={style.todoList}>
-          {filteredTodos.map(todo =>
-            <TodoItem key={todo.id} todo={todo} {...actions} />
+          {this.state.current_url_data.map(dolphin =>
+            <li>
+            <div>
+              {dolphin.selected_text}
+            </div>
+            <div>
+              {dolphin.dolphin_message}
+            </div>
+            </li>
           )}
         </ul>
       </section>

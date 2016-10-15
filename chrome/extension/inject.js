@@ -54,20 +54,28 @@ class DolphinComment extends Component {
 
   buttonOnClick() {
     let curr_data = {};
+    let current_url = this.state.data.current_url;
     curr_data['dolphin_message'] = this.state.dolphin_message;
     curr_data['selected_text'] = this.state.data.selected_text;
 
-    var retrievedObject = localStorage.getItem(this.state.data.current_url);
-    retrievedObject = JSON.parse(retrievedObject)
-    console.log(retrievedObject);
+    chrome.storage.sync.get(current_url, function (result) {
+      console.log(result.current_url);
+      let retrievedObject = [];
+      if(!result.current_url) {
+        retrievedObject = [];
+      } else {
+        retrievedObject = result.current_url;
+      }
+      retrievedObject.push(curr_data);
+      console.log(retrievedObject);
 
-    if(!retrievedObject) {
-      retrievedObject = [];
-    }
-    retrievedObject.push(curr_data);
+      let store_data = {};
+      store_data[current_url] = JSON.stringify(retrievedObject);
 
-    localStorage.setItem(this.state.data.current_url, JSON.stringify(retrievedObject));
-    removeExistingDolphinPopup();
+      console.log(store_data);
+      chrome.storage.sync.set(store_data, function(){});
+      removeExistingDolphinPopup();
+    }.bind(this));
   }
 
   handleChange(e) {
@@ -144,7 +152,6 @@ let getSelectionText = (e) => {
     return;
   }
 
-  console.log(text);
 
   var data = {
     'selected_text': text,
@@ -158,7 +165,7 @@ let getSelectionText = (e) => {
   console.log(selected_text_offset);
   let _top = selected_text_offset.top;
 
-  injectCommentForm.style.cssText = 'width:400px; position:absolute; padding:10px; right:100px; \
+  injectCommentForm.style.cssText = 'width:400px; position:fixed; padding:10px; right:100px; \
     background: #f5f5f5; border-radius:3px; box-sizing:border-box; box-shadow: 1px 1px 5px 1px rgba(159,167,194, 0.6);z-index: 100;';
   injectCommentForm.style.top = _top-30 + 'px';
 
@@ -168,7 +175,12 @@ let getSelectionText = (e) => {
   return text;
 }
 
-
+let saveCurrentURL = () => {
+  let current_url = window.location.href;
+  let store_data = {};
+  store_data['current_url'] = current_url;
+  chrome.storage.sync.set(store_data, function(){});
+}
 
 
 window.addEventListener('load', () => {
@@ -177,6 +189,10 @@ window.addEventListener('load', () => {
   injectDOM.className = 'inject-react-example';
   injectDOM.style.textAlign = 'center';
   document.body.appendChild(injectDOM);
+
+
+  // Save current URL in local storage because chrome's method is async
+  saveCurrentURL();
 
   document.onmouseup = getSelectionText;
   document.onkeyup = getSelectionText;
